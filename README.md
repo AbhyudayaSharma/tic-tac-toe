@@ -1,11 +1,10 @@
 # tic-tac-toe
 
-Get started
+To get started:
 
 ```bash
-mkdir virtualenv
-virtualenv virtualenv
-./virtualenv/Scripts/activate
+virtualenv venv
+./venv/Scripts/activate
 pip install -e .
 pip install -r requirements-dev.txt
 ```
