@@ -1,3 +1,4 @@
+"""Contains methods for generating a magic square"""
 import numpy as np
 
 
