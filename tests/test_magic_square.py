@@ -10,8 +10,16 @@ class MagicSquareTest(unittest.TestCase):
 
     def test_magic_square(self):
         magic_square = get_magic_square()
-        self.assertTrue(np.array_equal(magic_square.sum(axis=0), self.expected_array))
-        self.assertTrue(np.array_equal(magic_square.sum(axis=1), self.expected_array))
+        self.assertTrue(
+            np.array_equal(
+                magic_square.sum(
+                    axis=0),
+                self.expected_array))
+        self.assertTrue(
+            np.array_equal(
+                magic_square.sum(
+                    axis=1),
+                self.expected_array))
         self.assertEqual(magic_square.diagonal().sum(), self.expected_sum)
 
 
