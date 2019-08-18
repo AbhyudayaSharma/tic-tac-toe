@@ -73,3 +73,5 @@ venv
 
 # Python build cache
 __pycache__
+.pytest_cache
+tic_tac_toe.egg-info
