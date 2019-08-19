@@ -9,7 +9,7 @@ class MagicSquareTest(unittest.TestCase):
     expected_array = np.full(shape=3, fill_value=expected_sum)
 
     def test_magic_square(self):
-        magic_square = get_magic_square()
+        magic_square = get_magic_square(3)
         self.assertTrue(
             np.array_equal(
                 magic_square.sum(
