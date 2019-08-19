@@ -2,27 +2,27 @@
 import numpy as np
 
 
-def get_magic_square(n):
-    """Generates a magic square for odd `n`."""
-    # this function works only for odd `n`
-    assert n % 2 == 1
-    matrix = np.zeros(shape=(n, n))
+def get_magic_square(size):
+    """Generates a magic square for odd `size`."""
+    # this function works only for odd `size`
+    assert size % 2 == 1
+    matrix = np.zeros(shape=(size, size))
 
     # initialize position of 1
-    i = n // 2
-    j = n - 1
+    i = size // 2
+    j = size - 1
 
     count = 1
-    while count <= n * n:
+    while count <= size * size:
 
         # The indices should be within bounds of the matrix
-        if i == -1 and j == n:
-            j = n - 2
+        if i == -1 and j == size:
+            j = size - 2
             i = 0
-        elif j == n:
+        elif j == size:
             j = 0
         elif i < 0:
-            i = n - 1
+            i = size - 1
 
         if matrix[i][j]:
             j -= 2
