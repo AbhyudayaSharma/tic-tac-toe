@@ -23,7 +23,7 @@ class Game {
     private PlayerType currentPlayer = null;
     private String userChar;
     private String compChar;
-    private final int size = 3;
+    private final static int size = 3;
     private final JFrame gameFrame = new JFrame("Tic Tac Toe");
     private final List<Integer> humanMoves = new ArrayList<>(9);
     private final List<Integer> computerMoves = new ArrayList<>(9);
