@@ -1,4 +1,4 @@
-package com.abhyudayasharma.tictactoe;
+package com.abhyudaya_kabir.tictactoe;
 
 public class Main {
     public static void main(String[] args) {
