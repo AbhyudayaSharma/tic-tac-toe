@@ -1,4 +1,4 @@
-package com.abhyudayasharma;
+package com.abhyudayasharma.tictactoe;
 
 class MagicSquare {
     private int mainCnt = 0;

@@ -1,4 +1,4 @@
-package com.abhyudayasharma;
+package com.abhyudayasharma.tictactoe;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -47,7 +47,7 @@ class Game {
         }
 
         gameFrame.setPreferredSize(new Dimension(400, 400));
-        gameFrame.setLayout(new BoxLayout(gameFrame.getContentPane(), BoxLayout.PAGE_AXIS));
+        gameFrame.setLayout(new BoxLayout(gameFrame.getContentPane(), BoxLayout.LINE_AXIS));
         gameFrame.setResizable(false);
         gameFrame.add(boxes);
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
