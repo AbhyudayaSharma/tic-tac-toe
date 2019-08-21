@@ -288,7 +288,11 @@ class Game {
     }
 
     private void gameOver(String winner) {
-        boxes.setEnabled(false);
+        for (int i=0;i<size;++i) {
+            for (int j=0;j<size;++j) {
+                buttons[i][j].setEnabled(false);
+            }
+        }
         if (winner.equalsIgnoreCase("Computer")) {
             computerWins++;
         } else if (winner.equalsIgnoreCase("You")) {
