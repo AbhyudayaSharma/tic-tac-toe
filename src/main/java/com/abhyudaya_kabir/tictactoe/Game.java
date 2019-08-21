@@ -176,26 +176,22 @@ class Game {
                 buttons[i][j].setEnabled(false);
             }
         }
-        if (winner.equalsIgnoreCase("Computer"))
-        {
+        if (winner.equalsIgnoreCase("Computer")) {
             computerWins++;
-        }
-        else if (winner.equalsIgnoreCase("You"))
-        {
+        } else if (winner.equalsIgnoreCase("You")) {
             humanWins++;
         }
         String leader;
-        if (humanWins>computerWins)
-            leader="You";
-        else if (computerWins>humanWins)
-            leader="Computer";
+        if (humanWins > computerWins)
+            leader = "You";
+        else if (computerWins > humanWins)
+            leader = "Computer";
         else
-            leader="Nobody";
-        int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now "+humanWins+" - "+computerWins+"."
-            +"\nCurrent Leader: "+leader+"\nWould you like to play again?", "Game Over",
+            leader = "Nobody";
+        int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now " + humanWins + " - " + computerWins + "."
+                + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
             JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION)
-        {
+        if (result == JOptionPane.YES_OPTION) {
             gameFrame.dispose();
             new Game().start();
         }
@@ -225,8 +221,7 @@ class Game {
         int lastMove = (int) Player.get(Player.size() - 1);
         for (int i = 0; i < Player.size() - 1; ++i) {
             int diff = winningSum - ((int) Player.get(i) + lastMove);
-            if (!(Opponent.contains(diff) || diff < 1 || diff > 9 || Player.contains(diff)))
-            {
+            if (!(Opponent.contains(diff) || diff < 1 || diff > 9 || Player.contains(diff))) {
                 return diff;
             }
         }
