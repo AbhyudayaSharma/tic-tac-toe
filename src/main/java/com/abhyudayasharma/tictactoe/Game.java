@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.WindowConstants;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -59,6 +58,8 @@ class Game {
     private boolean flag = true;
     private static int humanWins = 0;
     private static int computerWins = 0;
+    private JPanel boxes = new JPanel();
+    private static String leader = "Nobody";
 
     @Nonnegative
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
@@ -75,7 +76,7 @@ class Game {
     void start() {
         gameFrame.setBackground(Color.BLACK);
 
-        JPanel boxes = new JPanel();
+
         boxes.setLayout(new GridLayout(3, 3, 5, 5));
         boxes.setBackground(Color.BLACK);
         boxes.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -101,6 +102,19 @@ class Game {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1;
         gbc.weighty = 0;
+
+        JLabel scoreLabel = new JLabel();
+        scoreLabel.setText("SCORE: " + humanWins + " - " + computerWins);
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        lists.add(scoreLabel, gbc);
+
+        gbc.gridy++;
+        JLabel leaderLabel = new JLabel();
+        leaderLabel.setText("Leader: " + leader);
+        leaderLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        lists.add(leaderLabel, gbc);
+
+        gbc.gridy++;
         lists.add(new JLabel("Human moves"), gbc);
         gbc.gridy++;
         gbc.fill = GridBagConstraints.VERTICAL;
@@ -110,6 +124,7 @@ class Game {
 
         gbc.gridy++;
         lists.add(new JLabel("Computer moves"), gbc);
+
         gbc.gridy++;
         var computerMovesScrollPane = new JScrollPane(computerMovesList);
         computerMovesScrollPane.setPreferredSize(new Dimension(100, 100));
@@ -123,7 +138,7 @@ class Game {
         gameFrame.setResizable(false);
         gameFrame.add(boxes);
         gameFrame.add(lists);
-        gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
         gameFrame.pack();
         gameFrame.setLocationRelativeTo(null);
@@ -202,16 +217,48 @@ class Game {
             }
         }
 
-        // Fork: Create an opportunity where you can win in two ways.
-        // Block Opponent's Fork.
-
         //Center: Play the center
+        int centre = magicSquare[size / 2][size / 2];
         if (flag) {
-            int centre = magicSquare[size / 2][size / 2];
             if (!(humanMoves.contains(centre) || computerMoves.contains(centre))) {
                 computerMoves.add(centre);
                 findAndDisable(centre);
                 flag = false;
+            }
+        }
+
+        //Block Opponent's Forks
+
+        //Block centre and corner move
+        if (flag) {
+            int[] temp = {2, 4, 6, 8};
+            if (humanMoves.size() == 2 && humanMoves.contains(centre) && elementCounter(humanMoves, temp) == 1) {
+                if (emptyCorner()) {
+                    flag = false;
+                }
+            }
+        }
+
+        //Block two corner move
+        if (flag) {
+            int[] temp = {2, 4, 6, 8};
+            if (humanMoves.size() == 2 && elementCounter(humanMoves, temp) == 2) {
+                if (emptySide()) {
+                    flag = false;
+                }
+            }
+        }
+
+        //Block two side move
+        if (flag) {
+            int[] temp = {1, 3, 7, 9};
+            if (humanMoves.size() == 2 && elementCounter(humanMoves, temp) == 2) {
+                int move = correctCorner(humanMoves);
+                if (move != 0) {
+                    computerMoves.add(move);
+                    findAndDisable(move);
+                    flag = false;
+                }
             }
         }
 
@@ -250,7 +297,7 @@ class Game {
         } else if (winner.equalsIgnoreCase("You")) {
             humanWins++;
         }
-        String leader;
+
         if (humanWins > computerWins)
             leader = "You";
         else if (computerWins > humanWins)
@@ -258,11 +305,13 @@ class Game {
         else
             leader = "Nobody";
         int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now " + humanWins + " - " + computerWins + "."
-                + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
+                                                                  + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
             JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
             gameFrame.dispose();
             new Game().start();
+        } else {
+            gameFrame.setVisible(true);
         }
 //        gameFrame.dispose();
     }
@@ -405,5 +454,30 @@ class Game {
             }
         }
         return false;
+    }
+
+    private int elementCounter(List Player, int[] arr) {
+        int cnt = 0;
+        for (int i1 : arr) {
+            if (Player.contains(i1))
+                cnt++;
+        }
+        return cnt;
+    }
+
+    private int correctCorner(List Player) {
+        if (Player.contains(1)) {
+            if (Player.contains(3))
+                return 8;
+            if (Player.contains(7))
+                return 6;
+        }
+        if (Player.contains(9)) {
+            if (Player.contains(3))
+                return 4;
+            if (Player.contains(7))
+                return 2;
+        }
+        return 0;
     }
 }
