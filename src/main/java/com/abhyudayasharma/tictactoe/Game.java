@@ -29,13 +29,43 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class contains logic for the AI of the game and maintains the UI.
+ * The AI is unbeatable.
+ *
+ * @author Abhyudaya Sharma
+ * @author Kabir Kanha Arora
+ */
 @ParametersAreNonnullByDefault
 class Game {
+    /**
+     * The current player.
+     */
     private PlayerType currentPlayer = null;
+
+    /**
+     * The character assigned to the user; either 'X' or 'O'.
+     */
     private String userChar;
+
+    /**
+     * The character assigned to the computer; either 'X' or 'O'.
+     */
     private String compChar;
+
+    /**
+     * The size of the tic-tac-toe board = 3.
+     */
     private final static int size = 3;
+
+    /**
+     * The containing the game.
+     */
     private final JFrame gameFrame = new JFrame("Tic Tac Toe");
+
+    /**
+     * List of moves made by the user.
+     */
     private final Vector<Integer> humanMoves = new Vector<>(9) {
         @Override
         public synchronized boolean add(Integer integer) {
@@ -44,6 +74,10 @@ class Game {
             return ret;
         }
     };
+
+    /**
+     * List of moves made by the computer.
+     */
     private final Vector<Integer> computerMoves = new Vector<>(9) {
         @Override
         public synchronized boolean add(Integer integer) {
@@ -52,19 +86,46 @@ class Game {
             return ret;
         }
     };
+
+    /**
+     * Displayable list of moves made by the human user.
+     */
     private final JList<Integer> humanMovesList = new JList<>();
+
+    /**
+     * Displayable list of moves made by the computer.
+     */
     private final JList<Integer> computerMovesList = new JList<>();
+
+    /**
+     * Clickable {@link JButton}s for user interactions.
+     */
     private JButton[][] buttons = new JButton[size][size];
     private boolean flag = true;
+
+    /**
+     * The number of wins made by the human player.
+     */
     private static int humanWins = 0;
+
+    /**
+     * The number of wins made by the computer.
+     */
     private static int computerWins = 0;
     private JPanel boxes = new JPanel();
     private static String leader = "Nobody";
 
+    /**
+     * Magic square used by the AI.
+     */
     @Nonnegative
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
+    /**
+     * The sum that gives a user his or her win.
+     */
     private final int winningSum = MagicSquare.getExpectedSum();
 
+    // Set up the look and feel to make the UI look good.
     static {
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
@@ -73,6 +134,9 @@ class Game {
         }
     }
 
+    /**
+     * Execution starts here.
+     */
     void start() {
         gameFrame.setBackground(Color.BLACK);
 
@@ -160,6 +224,13 @@ class Game {
         gameFrame.requestFocus();
     }
 
+    /**
+     * Adds listener to the button for user interaction which get fired when the button is clicked.
+     *
+     * @param button the button to which the action listener will be added
+     * @param row    zero-indexed row position of the button in the grid
+     * @param col    zero-indexed column position of the button in the grid
+     */
     private void addOnClickListener(JButton button, int row, int col) {
         button.addActionListener(e -> {
             flag = true;
@@ -194,6 +265,9 @@ class Game {
         });
     }
 
+    /**
+     * Handles the move of the user.
+     */
     private void userMove() {
         // Win: If you have two in a row, play the third to get three in a row.
         int winEntry;
@@ -286,6 +360,11 @@ class Game {
         currentPlayer = getNextPlayer();
     }
 
+    /**
+     * Finishes the game and asks the user whether he/she wants to play again.
+     *
+     * @param winner name of the player who won the game.
+     */
     private void gameOver(String winner) {
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++j) {
@@ -298,6 +377,7 @@ class Game {
             humanWins++;
         }
 
+        // calculate who's winning right now
         if (humanWins > computerWins)
             leader = "You";
         else if (computerWins > humanWins)
@@ -313,15 +393,20 @@ class Game {
         } else {
             gameFrame.setVisible(true);
         }
-//        gameFrame.dispose();
     }
 
+    /**
+     * Asks the user for input about who starts first.
+     *
+     * @return the {@link PlayerType} corresponding to the user's selected choice.s
+     */
     @CheckForNull
     private PlayerType findStartPlayer() {
         int response = JOptionPane.showOptionDialog(gameFrame, "Welcome to Tic Tac Toe!\n" +
                                                                    "Would you like to start first?",
             "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
             new String[]{"Yes", "No"}, "Yes");
+
         if (response == JOptionPane.CLOSED_OPTION) {
             return null;
         }
@@ -333,6 +418,13 @@ class Game {
         }
     }
 
+    /**
+     * Checks if the winning is possible
+     *
+     * @param Opponent list of computer moves
+     * @param Player   list of human moves
+     * @return difference or zero
+     */
     private int possWin(List Opponent, List Player) {
         if (Player.size() <= 1)
             return 0;
@@ -346,6 +438,11 @@ class Game {
         return 0;
     }
 
+    /**
+     * Finds a button from its magic square number and disables it after it has been clicked.
+     *
+     * @param num the number of the button corresponding to the magic square.
+     */
     private void findAndDisable(int num) {
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++j) {
@@ -357,6 +454,11 @@ class Game {
         }
     }
 
+    /**
+     * Returns the player who has the next turn.
+     *
+     * @return the player who has the next turn.
+     */
     @Nonnull
     private PlayerType getNextPlayer() {
         switch (currentPlayer) {
@@ -369,6 +471,12 @@ class Game {
         }
     }
 
+    /**
+     * Checks if the win for the human player is possible.
+     *
+     * @param Player List of player moves.
+     * @return true if a win is possible
+     */
     private boolean humanWin(List Player) {
         if (Player.size() <= 2)
             return false;
@@ -383,6 +491,11 @@ class Game {
         return false;
     }
 
+    /**
+     * Finds the opposite corner for the move.
+     *
+     * @return opposite corner for the move
+     */
     private boolean oppositeCorner() {
         for (int i = humanMoves.size() - 1; i >= 0; --i) {
             if (fillOppositeCorner(humanMoves.get(i))) {
@@ -392,12 +505,22 @@ class Game {
         return false;
     }
 
+    /**
+     * Finds an empty corner in the matrix
+     *
+     * @return an empty corner in the matrix
+     */
     private boolean emptyCorner() {
         int[] temp1 = new int[]{0, 0, size - 1, size - 1};
         int[] temp2 = new int[]{0, size - 1, 0, size - 1};
         return fillFirstFound(temp1, temp2);
     }
 
+    /**
+     * Finds an empty side in the matrix
+     *
+     * @return an empty side in the matrix
+     */
     private boolean emptySide() {
         int[] temp1 = new int[]{0, 1, 1, 2};
         int[] temp2 = new int[]{1, 0, 2, 1};

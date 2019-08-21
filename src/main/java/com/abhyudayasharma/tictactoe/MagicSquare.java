@@ -1,5 +1,10 @@
 package com.abhyudayasharma.tictactoe;
 
+/**
+ * Generates a magic square of odd size.
+ *
+ * @author Kabir Kanha Arora
+ */
 class MagicSquare {
     private int mainCnt = 0;
     private int[][] matrix;
