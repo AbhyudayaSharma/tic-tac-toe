@@ -3,12 +3,18 @@ package com.abhyudayasharma.tictactoe;
 class MagicSquare {
     private int mainCnt = 0;
     private int[][] matrix;
+    private static int expectedSum;
 
     private MagicSquare(int n) {
         int max = n * n;
+        expectedSum = (int) (n * (Math.pow(n, 2) + 1)) / 2;
         matrix = new int[n][n];
         matrix[0][(n - 1) / 2] = ++mainCnt;
         placeNextOdd(0, (n - 1) / 2, matrix, n, max);
+    }
+
+    static int getExpectedSum() {
+        return expectedSum;
     }
 
     static int[][] getMagicSquare(int n) {
