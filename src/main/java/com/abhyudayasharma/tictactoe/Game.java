@@ -13,7 +13,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -23,6 +27,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ParametersAreNonnullByDefault
 class Game {
@@ -58,6 +64,14 @@ class Game {
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
     private final int winningSum = MagicSquare.getExpectedSum();
 
+    static {
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+        } catch (UnsupportedLookAndFeelException e) {
+            Logger.getLogger(Game.class.getName()).log(Level.WARNING, "Unable to set Nimbus Look and Feel", e);
+        }
+    }
+
     void start() {
         gameFrame.setBackground(Color.BLACK);
 
@@ -88,17 +102,15 @@ class Game {
         gbc.weightx = 1;
         gbc.weighty = 0;
         lists.add(new JLabel("Human moves"), gbc);
-        gbc.gridx++;
-        lists.add(new JLabel("Computer moves"));
-        gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridheight = 7;
         gbc.fill = GridBagConstraints.VERTICAL;
         var humanMovesScrollPane = new JScrollPane(humanMovesList);
         humanMovesScrollPane.setPreferredSize(new Dimension(100, 100));
         lists.add(humanMovesScrollPane, gbc);
-        gbc.gridx++;
 
+        gbc.gridy++;
+        lists.add(new JLabel("Computer moves"), gbc);
+        gbc.gridy++;
         var computerMovesScrollPane = new JScrollPane(computerMovesList);
         computerMovesScrollPane.setPreferredSize(new Dimension(100, 100));
         lists.add(computerMovesScrollPane, gbc);
@@ -114,6 +126,7 @@ class Game {
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
         gameFrame.pack();
+        gameFrame.setLocationRelativeTo(null);
 
         // Who starts first?
         PlayerType startPlayer = findStartPlayer();
@@ -129,32 +142,44 @@ class Game {
             compChar = "X";
             userMove();
         }
+        gameFrame.requestFocus();
     }
 
     private void addOnClickListener(JButton button, int row, int col) {
         button.addActionListener(e -> {
             flag = true;
             button.setEnabled(false);
+            gameFrame.requestFocus();
 
             button.setText(userChar);
             humanMoves.add(magicSquare[row][col]);
+            // disable the frame to avoid clicks when we simulate calculation
+            gameFrame.setEnabled(false);
 
-            // Check if human has won
-            boolean win = humanWin(humanMoves);
-            if (win) {
-                gameOver("YOU");
-                flag = false;
-            } else {
-                if (humanMoves.size() + computerMoves.size() == 9) {
-                    gameOver("NOBODY");
+            // delay the response of the computer
+            Timer timer = new Timer(500, l -> {
+                // Check if human has won
+                boolean win = humanWin(humanMoves);
+                if (win) {
+                    gameOver("YOU");
+                    flag = false;
+                } else {
+                    if (humanMoves.size() + computerMoves.size() == 9) {
+                        gameOver("NOBODY");
+                    }
+
+                    userMove();
                 }
-                userMove();
-            }
+                // re-enable the frame after the computer is done
+                gameFrame.setEnabled(true);
+            });
+
+            timer.setRepeats(false);
+            timer.start();
         });
     }
 
     private void userMove() {
-
         // Win: If you have two in a row, play the third to get three in a row.
         int winEntry;
         if (flag) {
@@ -177,9 +202,8 @@ class Game {
             }
         }
 
-        //Fork: Create an opportunity where you can win in two ways.
-        //
-        //Block Opponent's Fork.
+        // Fork: Create an opportunity where you can win in two ways.
+        // Block Opponent's Fork.
 
         //Center: Play the center
         if (flag) {
