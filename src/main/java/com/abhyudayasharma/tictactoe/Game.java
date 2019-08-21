@@ -31,8 +31,22 @@ class Game {
     private String compChar;
     private final static int size = 3;
     private final JFrame gameFrame = new JFrame("Tic Tac Toe");
-    private final Vector<Integer> humanMoves = new Vector<>(9);
-    private final Vector<Integer> computerMoves = new Vector<>(9);
+    private final Vector<Integer> humanMoves = new Vector<>(9) {
+        @Override
+        public synchronized boolean add(Integer integer) {
+            boolean ret = super.add(integer);
+            humanMovesList.setListData(this);
+            return ret;
+        }
+    };
+    private final Vector<Integer> computerMoves = new Vector<>(9) {
+        @Override
+        public synchronized boolean add(Integer integer) {
+            boolean ret = super.add(integer);
+            computerMovesList.setListData(this);
+            return ret;
+        }
+    };
     private final JList<Integer> humanMovesList = new JList<>();
     private final JList<Integer> computerMovesList = new JList<>();
     private JButton[][] buttons = new JButton[size][size];
@@ -88,6 +102,9 @@ class Game {
         lists.add(computerMovesScrollPane, gbc);
         lists.setBackground(Color.WHITE);
 
+        computerMovesList.setEnabled(false);
+        humanMovesList.setEnabled(false);
+
         gameFrame.setLayout(new BoxLayout(gameFrame.getContentPane(), BoxLayout.LINE_AXIS));
         gameFrame.setResizable(false);
         gameFrame.add(boxes);
@@ -120,9 +137,7 @@ class Game {
             button.setText(userChar);
             humanMoves.add(magicSquare[row][col]);
 
-            currentPlayer = getNextPlayer();
-
-            //Check if human has won
+            // Check if human has won
             boolean win = humanWin(humanMoves);
             if (win) {
                 gameOver("You");
@@ -138,7 +153,7 @@ class Game {
 
     private void userMove() {
 
-        //Win: If you have two in a row, play the third to get three in a row.
+        // Win: If you have two in a row, play the third to get three in a row.
         int winEntry;
         if (flag) {
             winEntry = possWin(humanMoves, computerMoves);
@@ -206,6 +221,7 @@ class Game {
                 buttons[i][j].setEnabled(false);
             }
         }
+        // TODO: 8/21/2019 Should we dispose the frame?
 //        gameFrame.dispose();
     }
 
