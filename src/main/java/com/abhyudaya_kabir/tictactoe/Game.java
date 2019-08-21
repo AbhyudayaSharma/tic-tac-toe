@@ -29,6 +29,8 @@ class Game {
     private final List<Integer> computerMoves = new ArrayList<>(9);
     private JButton[][] buttons = new JButton[size][size];
     private boolean flag = true;
+    private static int humanWins = 0;
+    private static int computerWins = 0;
 
     @Nonnegative
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
@@ -92,11 +94,11 @@ class Game {
             //Check if human has won
             boolean win = humanWin(humanMoves);
             if (win) {
-                gameOver("You");
+                gameOver("YOU");
                 flag = false;
             } else {
                 if (humanMoves.size() + computerMoves.size() == 9) {
-                    gameOver("Nobody");
+                    gameOver("NOBODY");
                 }
                 userMove();
             }
@@ -112,7 +114,7 @@ class Game {
             if (winEntry > 0 && winEntry < 10) {
                 computerMoves.add(winEntry);
                 findAndDisable(winEntry);
-                gameOver("Computer");
+                gameOver("COMPUTER");
                 flag = false;
             }
         }
@@ -162,7 +164,7 @@ class Game {
             }
         }
         if (humanMoves.size() + computerMoves.size() == 9) {
-            gameOver("Nobody");
+            gameOver("NOBODY");
         }
 
         currentPlayer = getNextPlayer();
@@ -174,7 +176,23 @@ class Game {
                 buttons[i][j].setEnabled(false);
             }
         }
-        int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " won.\nWould you like to play again?", "Game Over",
+        if (winner.equalsIgnoreCase("Computer"))
+        {
+            computerWins++;
+        }
+        else if (winner.equalsIgnoreCase("You"))
+        {
+            humanWins++;
+        }
+        String leader;
+        if (humanWins>computerWins)
+            leader="You";
+        else if (computerWins>humanWins)
+            leader="Computer";
+        else
+            leader="Nobody";
+        int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now "+humanWins+" - "+computerWins+"."
+            +"\nCurrent Leader: "+leader+"\nWould you like to play again?", "Game Over",
             JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION)
         {
