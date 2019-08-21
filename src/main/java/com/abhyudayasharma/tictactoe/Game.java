@@ -14,7 +14,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,6 +27,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ParametersAreNonnullByDefault
 class Game {
@@ -56,6 +61,14 @@ class Game {
     @Nonnegative
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
     private final int winningSum = MagicSquare.getExpectedSum();
+
+    static {
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+        } catch (UnsupportedLookAndFeelException e) {
+            Logger.getLogger(Game.class.getName()).log(Level.WARNING, "Unable to set Nimbus Look and Feel", e);
+        }
+    }
 
     void start() {
         gameFrame.setBackground(Color.BLACK);
@@ -127,12 +140,14 @@ class Game {
             compChar = "X";
             userMove();
         }
+        gameFrame.requestFocus();
     }
 
     private void addOnClickListener(JButton button, int row, int col) {
         button.addActionListener(e -> {
             flag = true;
             button.setEnabled(false);
+            gameFrame.requestFocus();
 
             button.setText(userChar);
             humanMoves.add(magicSquare[row][col]);
