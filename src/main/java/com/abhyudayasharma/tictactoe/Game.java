@@ -13,6 +13,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -86,17 +87,15 @@ class Game {
         gbc.weightx = 1;
         gbc.weighty = 0;
         lists.add(new JLabel("Human moves"), gbc);
-        gbc.gridx++;
-        lists.add(new JLabel("Computer moves"));
-        gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridheight = 7;
         gbc.fill = GridBagConstraints.VERTICAL;
         var humanMovesScrollPane = new JScrollPane(humanMovesList);
         humanMovesScrollPane.setPreferredSize(new Dimension(100, 100));
         lists.add(humanMovesScrollPane, gbc);
-        gbc.gridx++;
 
+        gbc.gridy++;
+        lists.add(new JLabel("Computer moves"), gbc);
+        gbc.gridy++;
         var computerMovesScrollPane = new JScrollPane(computerMovesList);
         computerMovesScrollPane.setPreferredSize(new Dimension(100, 100));
         lists.add(computerMovesScrollPane, gbc);
@@ -112,6 +111,7 @@ class Game {
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
         gameFrame.pack();
+        gameFrame.setLocationRelativeTo(null);
 
         // Who starts first?
         PlayerType startPlayer = findStartPlayer();
@@ -136,23 +136,33 @@ class Game {
 
             button.setText(userChar);
             humanMoves.add(magicSquare[row][col]);
+            // disable the frame to avoid clicks when we simulate calculation
+            gameFrame.setEnabled(false);
 
-            // Check if human has won
-            boolean win = humanWin(humanMoves);
-            if (win) {
-                gameOver("You");
-                flag = false;
-            } else {
-                if (humanMoves.size() + computerMoves.size() == 9) {
-                    gameOver("Nobody");
+            // delay the response of the computer
+            Timer timer = new Timer(500, l -> {
+                // Check if human has won
+                boolean win = humanWin(humanMoves);
+                if (win) {
+                    gameOver("You");
+                    flag = false;
+                } else {
+                    if (humanMoves.size() + computerMoves.size() == 9) {
+                        gameOver("Nobody");
+                    }
+
+                    userMove();
                 }
-                userMove();
-            }
+                // re-enable the frame after the computer is done
+                gameFrame.setEnabled(true);
+            });
+
+            timer.setRepeats(false);
+            timer.start();
         });
     }
 
     private void userMove() {
-
         // Win: If you have two in a row, play the third to get three in a row.
         int winEntry;
         if (flag) {
@@ -175,9 +185,8 @@ class Game {
             }
         }
 
-        //Fork: Create an opportunity where you can win in two ways.
-        //
-        //Block Opponent's Fork.
+        // Fork: Create an opportunity where you can win in two ways.
+        // Block Opponent's Fork.
 
         //Center: Play the center
         if (flag) {
