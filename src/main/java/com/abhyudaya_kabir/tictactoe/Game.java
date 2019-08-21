@@ -169,12 +169,17 @@ class Game {
     }
 
     private void gameOver(String winner) {
-        JOptionPane.showMessageDialog(gameFrame, "Game Over! " + winner + " won.", "Game Over",
-            JOptionPane.PLAIN_MESSAGE);
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++j) {
                 buttons[i][j].setEnabled(false);
             }
+        }
+        int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " won.\nWould you like to play again?", "Game Over",
+            JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION)
+        {
+            gameFrame.dispose();
+            new Game().start();
         }
 //        gameFrame.dispose();
     }
