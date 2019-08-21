@@ -1,4 +1,4 @@
-package com.abhyudaya_kabir.tictactoe;
+package com.abhyudayasharma.tictactoe;
 
 public enum PlayerType {
     HUMAN,

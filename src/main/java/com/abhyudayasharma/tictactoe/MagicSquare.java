@@ -1,4 +1,4 @@
-package com.abhyudaya_kabir.tictactoe;
+package com.abhyudayasharma.tictactoe;
 
 class MagicSquare {
     private int mainCnt = 0;
@@ -7,7 +7,7 @@ class MagicSquare {
 
     private MagicSquare(int n) {
         int max = n * n;
-        expectedSum = (int)(n * (Math.pow(n, 2) + 1)) / 2;
+        expectedSum = (int) (n * (Math.pow(n, 2) + 1)) / 2;
         matrix = new int[n][n];
         matrix[0][(n - 1) / 2] = ++mainCnt;
         placeNextOdd(0, (n - 1) / 2, matrix, n, max);
