@@ -33,8 +33,8 @@ import java.util.logging.Logger;
  * This class contains logic for the AI of the game and maintains the UI.
  * The AI is unbeatable.
  *
- * @author Abhyudaya Sharma
- * @author Kabir Kanha Arora
+ * @author Abhyudaya Sharma 1710110019
+ * @author Kabir Kanha Arora 1710110165
  */
 @ParametersAreNonnullByDefault
 class Game {
@@ -112,7 +112,15 @@ class Game {
      * The number of wins made by the computer.
      */
     private static int computerWins = 0;
+
+    /**
+     * JPanel to display the buttons for the game
+     */
     private JPanel boxes = new JPanel();
+
+    /**
+     * String that stores the name of the current scoreboard leader
+     */
     private static String leader = "Nobody";
 
     /**
@@ -120,6 +128,7 @@ class Game {
      */
     @Nonnegative
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
+
     /**
      * The sum that gives a user his or her win.
      */
@@ -128,6 +137,7 @@ class Game {
     // Set up the look and feel to make the UI look good.
     static {
         try {
+            //Using Nimbus Look and Feel
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             Logger.getLogger(Game.class.getName()).log(Level.WARNING, "Unable to set Nimbus Look and Feel", e);
@@ -138,13 +148,22 @@ class Game {
      * Execution starts here.
      */
     void start() {
+        //Sets the background colour of the main frame
         gameFrame.setBackground(Color.BLACK);
 
-
+        //Using GridLayout to place buttons
         boxes.setLayout(new GridLayout(3, 3, 5, 5));
+        //Setting background colour of the panel
         boxes.setBackground(Color.BLACK);
+        //Create an empty border around the panel
         boxes.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+        /*
+         Declares the 9 JButtons
+         Adds an action listener to each
+         And adds each of them to the panel
+         Other visual appearance settings are also handled here
+         */
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; ++j) {
                 buttons[i][j] = new JButton();
@@ -157,6 +176,7 @@ class Game {
             }
         }
 
+        //Sets the constraints for using GridBagLayout
         JPanel lists = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -167,17 +187,20 @@ class Game {
         gbc.weightx = 1;
         gbc.weighty = 0;
 
+        //Adds the label to display the current score on the GUI
         JLabel scoreLabel = new JLabel();
         scoreLabel.setText("SCORE: " + humanWins + " - " + computerWins);
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 14));
         lists.add(scoreLabel, gbc);
 
+        //Displayes the label to show the current leader on the GUI
         gbc.gridy++;
         JLabel leaderLabel = new JLabel();
         leaderLabel.setText("Leader: " + leader);
         leaderLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         lists.add(leaderLabel, gbc);
 
+        //Displays the moves made by the human. Numbering is as per the Magic Square.
         gbc.gridy++;
         lists.add(new JLabel("Human moves"), gbc);
         gbc.gridy++;
@@ -186,18 +209,20 @@ class Game {
         humanMovesScrollPane.setPreferredSize(new Dimension(100, 100));
         lists.add(humanMovesScrollPane, gbc);
 
+        //Displays the moves made by the human. Numbering is as per the Magic Square.
         gbc.gridy++;
         lists.add(new JLabel("Computer moves"), gbc);
-
         gbc.gridy++;
         var computerMovesScrollPane = new JScrollPane(computerMovesList);
         computerMovesScrollPane.setPreferredSize(new Dimension(100, 100));
         lists.add(computerMovesScrollPane, gbc);
         lists.setBackground(Color.WHITE);
 
+        //Disables user click
         computerMovesList.setEnabled(false);
         humanMovesList.setEnabled(false);
 
+        //Sets constraints for the main frame
         gameFrame.setLayout(new BoxLayout(gameFrame.getContentPane(), BoxLayout.LINE_AXIS));
         gameFrame.setResizable(false);
         gameFrame.add(boxes);
@@ -213,13 +238,15 @@ class Game {
             gameFrame.dispose();
         }
         currentPlayer = startPlayer;
+
+        //Ensure fist player starts with 'X'
         if (startPlayer == PlayerType.HUMAN) {
             userChar = "X";
             compChar = "O";
         } else {
             userChar = "O";
             compChar = "X";
-            userMove();
+            computerMove();
         }
         gameFrame.requestFocus();
     }
@@ -233,7 +260,9 @@ class Game {
      */
     private void addOnClickListener(JButton button, int row, int col) {
         button.addActionListener(e -> {
+            //flag to check if the game has ended.
             flag = true;
+            //Disables button clicked by the user
             button.setEnabled(false);
             gameFrame.requestFocus();
 
@@ -250,16 +279,17 @@ class Game {
                     gameOver("YOU");
                     flag = false;
                 } else {
+                    //Check if the grid is full
                     if (humanMoves.size() + computerMoves.size() == 9) {
                         gameOver("NOBODY");
                     }
-
-                    userMove();
+                    //AI plays now
+                    computerMove();
                 }
                 // re-enable the frame after the computer is done
                 gameFrame.setEnabled(true);
             });
-
+            //Prevents the timer from repeating automatically.
             timer.setRepeats(false);
             timer.start();
         });
@@ -268,7 +298,7 @@ class Game {
     /**
      * Handles the move of the user.
      */
-    private void userMove() {
+    private void computerMove() {
         // Win: If you have two in a row, play the third to get three in a row.
         int winEntry;
         if (flag) {
@@ -301,9 +331,11 @@ class Game {
             }
         }
 
-        //Block Opponent's Forks
+        /*
+         Block Opponent's Forks (Double Attacks)
+         */
 
-        //Block centre and corner move
+        //Block centre and corner move by moving in a corner
         if (flag) {
             int[] temp = {2, 4, 6, 8};
             if (humanMoves.size() == 2 && humanMoves.contains(centre) && elementCounter(humanMoves, temp) == 1) {
@@ -313,7 +345,7 @@ class Game {
             }
         }
 
-        //Block two corner move
+        //Block two corner move by moving in an empty side
         if (flag) {
             int[] temp = {2, 4, 6, 8};
             if (humanMoves.size() == 2 && elementCounter(humanMoves, temp) == 2) {
@@ -323,7 +355,7 @@ class Game {
             }
         }
 
-        //Block two side move
+        //Block two side move by moving in corner between them
         if (flag) {
             int[] temp = {1, 3, 7, 9};
             if (humanMoves.size() == 2 && elementCounter(humanMoves, temp) == 2) {
@@ -356,7 +388,7 @@ class Game {
                 flag = false;
             }
         }
-
+        //User's turn
         currentPlayer = getNextPlayer();
     }
 
@@ -371,6 +403,7 @@ class Game {
                 buttons[i][j].setEnabled(false);
             }
         }
+        //Update scoreboard
         if (winner.equalsIgnoreCase("Computer")) {
             computerWins++;
         } else if (winner.equalsIgnoreCase("You")) {
@@ -385,7 +418,7 @@ class Game {
         else
             leader = "Nobody";
         int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now " + humanWins + " - " + computerWins + "."
-                                                                  + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
+                + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
             JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
             gameFrame.dispose();
@@ -403,7 +436,7 @@ class Game {
     @CheckForNull
     private PlayerType findStartPlayer() {
         int response = JOptionPane.showOptionDialog(gameFrame, "Welcome to Tic Tac Toe!\n" +
-                                                                   "Would you like to start first?",
+                "Would you like to start first?",
             "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
             new String[]{"Yes", "No"}, "Yes");
 
@@ -527,6 +560,14 @@ class Game {
         return fillFirstFound(temp1, temp2);
     }
 
+    /**
+     * Moves in the square identified by two integer arrays.
+     * The first corresponding pair location found empty is the move.
+     *
+     * @param temp1 integer array 1
+     * @param temp2 integer array 2
+     * @return true if successfully moved
+     */
     private boolean fillFirstFound(int[] temp1, int[] temp2) {
         for (int i = 0, j = 0; i < temp1.length && j < temp2.length; ++i, ++j) {
             int num = magicSquare[temp1[i]][temp2[j]];
@@ -540,6 +581,12 @@ class Game {
         return false;
     }
 
+    /**
+     * Moves in a corner opposite to an an already filled one.
+     *
+     * @param num An entry existing in the list of human moves.
+     * @return true is move is successful
+     */
     private boolean fillOppositeCorner(int num) {
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++j) {
@@ -579,6 +626,13 @@ class Game {
         return false;
     }
 
+    /**
+     * Counts the number of elements common in an array and a List
+     *
+     * @param Player the list of player moves
+     * @param arr    an integer array
+     * @return the number of common elements
+     */
     private int elementCounter(List Player, int[] arr) {
         int cnt = 0;
         for (int i1 : arr) {
@@ -588,6 +642,12 @@ class Game {
         return cnt;
     }
 
+    /**
+     * Chooses the correct corner to move in to block the double side fork
+     *
+     * @param Player lise of human moves
+     * @return the spot for the correct move. 0 if none.
+     */
     private int correctCorner(List Player) {
         if (Player.contains(1)) {
             if (Player.contains(3))
