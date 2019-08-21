@@ -55,6 +55,7 @@ class Game {
                 buttons[i][j] = new JButton();
                 buttons[i][j].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 44));
                 buttons[i][j].setBackground(Color.WHITE);
+                buttons[i][j].setPreferredSize(new Dimension(100, 100));
                 addOnClickListener(buttons[i][j], i, j);
                 boxes.add(buttons[i][j]);
                 boxes.setBackground(Color.WHITE);
@@ -192,9 +193,6 @@ class Game {
             if (emptySide()) {
                 flag = false;
             }
-        }
-        if (humanMoves.size() + computerMoves.size() == 9) {
-            gameOver("Nobody");
         }
 
         currentPlayer = getNextPlayer();
