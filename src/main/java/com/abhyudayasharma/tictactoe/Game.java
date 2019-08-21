@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.WindowConstants;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -288,8 +287,8 @@ class Game {
     }
 
     private void gameOver(String winner) {
-        for (int i=0;i<size;++i) {
-            for (int j=0;j<size;++j) {
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
                 buttons[i][j].setEnabled(false);
             }
         }
@@ -306,7 +305,7 @@ class Game {
         else
             leader = "Nobody";
         int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now " + humanWins + " - " + computerWins + "."
-                + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
+                                                                  + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
             JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
             gameFrame.dispose();
@@ -320,7 +319,7 @@ class Game {
     @CheckForNull
     private PlayerType findStartPlayer() {
         int response = JOptionPane.showOptionDialog(gameFrame, "Welcome to Tic Tac Toe!\n" +
-                "Would you like to start first?",
+                                                                   "Would you like to start first?",
             "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
             new String[]{"Yes", "No"}, "Yes");
         if (response == JOptionPane.CLOSED_OPTION) {
