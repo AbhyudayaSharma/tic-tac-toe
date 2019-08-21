@@ -57,6 +57,8 @@ class Game {
     private final JList<Integer> computerMovesList = new JList<>();
     private JButton[][] buttons = new JButton[size][size];
     private boolean flag = true;
+    private static int humanWins = 0;
+    private static int computerWins = 0;
 
     @Nonnegative
     private final int[][] magicSquare = MagicSquare.getMagicSquare(size);
@@ -159,11 +161,11 @@ class Game {
                 // Check if human has won
                 boolean win = humanWin(humanMoves);
                 if (win) {
-                    gameOver("You");
+                    gameOver("YOU");
                     flag = false;
                 } else {
                     if (humanMoves.size() + computerMoves.size() == 9) {
-                        gameOver("Nobody");
+                        gameOver("NOBODY");
                     }
 
                     userMove();
@@ -185,7 +187,7 @@ class Game {
             if (winEntry > 0 && winEntry < 10) {
                 computerMoves.add(winEntry);
                 findAndDisable(winEntry);
-                gameOver("Computer");
+                gameOver("COMPUTER");
                 flag = false;
             }
         }
@@ -238,14 +240,30 @@ class Game {
     }
 
     private void gameOver(String winner) {
-        JOptionPane.showMessageDialog(gameFrame, "Game Over! " + winner + " won.", "Game Over",
-            JOptionPane.PLAIN_MESSAGE);
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++j) {
                 buttons[i][j].setEnabled(false);
             }
         }
-        // TODO: 8/21/2019 Should we dispose the frame?
+        if (winner.equalsIgnoreCase("Computer")) {
+            computerWins++;
+        } else if (winner.equalsIgnoreCase("You")) {
+            humanWins++;
+        }
+        String leader;
+        if (humanWins > computerWins)
+            leader = "You";
+        else if (computerWins > humanWins)
+            leader = "Computer";
+        else
+            leader = "Nobody";
+        int result = JOptionPane.showConfirmDialog(gameFrame, "Game Over! " + winner + " WON.\nThe score is now " + humanWins + " - " + computerWins + "."
+                + "\nCurrent Leader: " + leader + "\nWould you like to play again?", "Game Over",
+            JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            gameFrame.dispose();
+            new Game().start();
+        }
 //        gameFrame.dispose();
     }
 
@@ -388,5 +406,4 @@ class Game {
         }
         return false;
     }
-
 }
