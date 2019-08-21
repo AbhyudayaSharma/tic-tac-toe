@@ -1,4 +1,4 @@
-package com.abhyudaya_kabir.tictactoe;
+package com.abhyudayasharma.tictactoe;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -8,15 +8,21 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.util.ArrayList;
+import java.awt.Insets;
 import java.util.List;
+import java.util.Vector;
 
 @ParametersAreNonnullByDefault
 class Game {
@@ -25,8 +31,24 @@ class Game {
     private String compChar;
     private final static int size = 3;
     private final JFrame gameFrame = new JFrame("Tic Tac Toe");
-    private final List<Integer> humanMoves = new ArrayList<>(9);
-    private final List<Integer> computerMoves = new ArrayList<>(9);
+    private final Vector<Integer> humanMoves = new Vector<>(9) {
+        @Override
+        public synchronized boolean add(Integer integer) {
+            boolean ret = super.add(integer);
+            humanMovesList.setListData(this);
+            return ret;
+        }
+    };
+    private final Vector<Integer> computerMoves = new Vector<>(9) {
+        @Override
+        public synchronized boolean add(Integer integer) {
+            boolean ret = super.add(integer);
+            computerMovesList.setListData(this);
+            return ret;
+        }
+    };
+    private final JList<Integer> humanMovesList = new JList<>();
+    private final JList<Integer> computerMovesList = new JList<>();
     private JButton[][] buttons = new JButton[size][size];
     private boolean flag = true;
 
@@ -47,20 +69,48 @@ class Game {
                 buttons[i][j] = new JButton();
                 buttons[i][j].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 44));
                 buttons[i][j].setBackground(Color.WHITE);
+                buttons[i][j].setPreferredSize(new Dimension(100, 100));
                 addOnClickListener(buttons[i][j], i, j);
                 boxes.add(buttons[i][j]);
                 boxes.setBackground(Color.WHITE);
             }
         }
 
+        JPanel lists = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        lists.add(new JLabel("Human moves"), gbc);
+        gbc.gridx++;
+        lists.add(new JLabel("Computer moves"));
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridheight = 7;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        var humanMovesScrollPane = new JScrollPane(humanMovesList);
+        humanMovesScrollPane.setPreferredSize(new Dimension(100, 100));
+        lists.add(humanMovesScrollPane, gbc);
+        gbc.gridx++;
 
-        gameFrame.setPreferredSize(new Dimension(400, 400));
+        var computerMovesScrollPane = new JScrollPane(computerMovesList);
+        computerMovesScrollPane.setPreferredSize(new Dimension(100, 100));
+        lists.add(computerMovesScrollPane, gbc);
+        lists.setBackground(Color.WHITE);
+
+        computerMovesList.setEnabled(false);
+        humanMovesList.setEnabled(false);
+
         gameFrame.setLayout(new BoxLayout(gameFrame.getContentPane(), BoxLayout.LINE_AXIS));
         gameFrame.setResizable(false);
         gameFrame.add(boxes);
+        gameFrame.add(lists);
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
-        gameFrame.setLocationRelativeTo(null);
         gameFrame.pack();
 
         // Who starts first?
@@ -87,9 +137,7 @@ class Game {
             button.setText(userChar);
             humanMoves.add(magicSquare[row][col]);
 
-            currentPlayer = getNextPlayer();
-
-            //Check if human has won
+            // Check if human has won
             boolean win = humanWin(humanMoves);
             if (win) {
                 gameOver("You");
@@ -105,7 +153,7 @@ class Game {
 
     private void userMove() {
 
-        //Win: If you have two in a row, play the third to get three in a row.
+        // Win: If you have two in a row, play the third to get three in a row.
         int winEntry;
         if (flag) {
             winEntry = possWin(humanMoves, computerMoves);
@@ -161,9 +209,6 @@ class Game {
                 flag = false;
             }
         }
-        if (humanMoves.size() + computerMoves.size() == 9) {
-            gameOver("Nobody");
-        }
 
         currentPlayer = getNextPlayer();
     }
@@ -176,13 +221,14 @@ class Game {
                 buttons[i][j].setEnabled(false);
             }
         }
+        // TODO: 8/21/2019 Should we dispose the frame?
 //        gameFrame.dispose();
     }
 
     @CheckForNull
     private PlayerType findStartPlayer() {
         int response = JOptionPane.showOptionDialog(gameFrame, "Welcome to Tic Tac Toe!\n" +
-                "Would you like to start first?",
+                                                                   "Would you like to start first?",
             "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
             new String[]{"Yes", "No"}, "Yes");
         if (response == JOptionPane.CLOSED_OPTION) {
@@ -202,8 +248,7 @@ class Game {
         int lastMove = (int) Player.get(Player.size() - 1);
         for (int i = 0; i < Player.size() - 1; ++i) {
             int diff = winningSum - ((int) Player.get(i) + lastMove);
-            if (!(Opponent.contains(diff) || diff < 1 || diff > 9 || Player.contains(diff)))
-            {
+            if (!(Opponent.contains(diff) || diff < 1 || diff > 9 || Player.contains(diff))) {
                 return diff;
             }
         }
@@ -319,6 +364,5 @@ class Game {
         }
         return false;
     }
-
 
 }
